@@ -50,8 +50,8 @@ export default function GuestbookClient() {
       return
     }
 
-    if (message.length > 100) {
-      alert('메시지는 100글자를 초과할 수 없습니다!')
+    if (message.length > 30) {
+      alert('메시지는 30글자를 초과할 수 없습니다!')
       return
     }
 
@@ -102,12 +102,13 @@ export default function GuestbookClient() {
   // 페이지 번호 배열 생성 (최대 5개 페이지 번호만 표시)
   const getPageNumbers = () => {
     const pageNumbers = []
-    let startPage = Math.max(1, currentPage - 2)
-    let endPage = Math.min(totalPages, startPage + 4)
+    const maxPages = 5 // 한 번에 보여줄 최대 페이지 번호 수
 
-    if (endPage - startPage < 4) {
-      startPage = Math.max(1, endPage - 4)
-    }
+    let startPage = Math.max(1, currentPage - Math.floor(maxPages / 2))
+    const endPage = Math.min(totalPages, startPage + maxPages - 1)
+
+    // startPage 조정
+    startPage = Math.max(1, endPage - maxPages + 1)
 
     for (let i = startPage; i <= endPage; i++) {
       pageNumbers.push(i)
@@ -168,7 +169,7 @@ export default function GuestbookClient() {
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="메시지를 입력하세요 (100글자 이내)"
+                placeholder="메시지를 입력하세요 (30글자 이내)"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 maxLength={30}
