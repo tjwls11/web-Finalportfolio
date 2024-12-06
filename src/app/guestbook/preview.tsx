@@ -1,22 +1,13 @@
 import mongoose from 'mongoose'
 import { connectToDB } from '@/libs/mongodb'
+import Link from 'next/link'
 
-// 메시지 타입 정의
 interface IMessage {
   _id: mongoose.Types.ObjectId
   name: string
   message: string
   time: string
   isAnonymous: boolean
-}
-
-// MongoDB에서 반환되는 데이터의 타입
-interface MongoMessage {
-  _id: mongoose.Types.ObjectId
-  name?: string
-  message?: string
-  time?: string
-  isAnonymous?: boolean
 }
 
 const messageSchema = new mongoose.Schema({
@@ -27,29 +18,29 @@ const messageSchema = new mongoose.Schema({
 })
 
 const Message =
-  mongoose.models.Message || mongoose.model('Message', messageSchema)
+  mongoose.models.Message || mongoose.model<IMessage>('Message', messageSchema)
 
 export default async function GuestbookPreview() {
   try {
     await connectToDB()
 
-    const rawMessages = (await Message.find()
+    const messages = (await Message.find()
       .sort({ time: -1 })
       .limit(3)
-      .lean()) as MongoMessage[]
-
-    const messages = rawMessages.map((msg) => ({
-      _id: msg._id,
-      name: msg.name || '',
-      message: msg.message || '',
-      time: msg.time || new Date().toISOString(),
-      isAnonymous: Boolean(msg.isAnonymous),
-    })) as IMessage[]
+      .lean()) as unknown as IMessage[]
 
     if (messages.length === 0) {
       return (
         <div className="text-white text-center p-4">
           아직 작성된 메시지가 없습니다.
+          <div className="mt-4">
+            <Link
+              href="/guestbook"
+              className="text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              첫 메시지를 남겨보세요! →
+            </Link>
+          </div>
         </div>
       )
     }

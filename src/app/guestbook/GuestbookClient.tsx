@@ -14,9 +14,19 @@ interface Message {
 export default function GuestbookClient() {
   const { data: session } = useSession()
   const [messages, setMessages] = useState<Message[]>([])
-  const [name, setName] = useState('')
   const [message, setMessage] = useState('')
   const [isAnonymous, setIsAnonymous] = useState(false)
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+
+    return `${year}.${month}.${day} ${hours}:${minutes}`
+  }
 
   useEffect(() => {
     fetch('/api/guestbook')
@@ -26,14 +36,27 @@ export default function GuestbookClient() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!message) return alert('메시지를 입력해주세요!')
+
+    if (!session) {
+      alert('로그인이 필요합니다!')
+      signIn()
+      return
+    }
+
+    if (!message) {
+      alert('메시지를 입력해주세요!')
+      return
+    }
+
+    if (message.length > 30) {
+      alert('메시지는 30글자를 초과할 수 없습니다!')
+      return
+    }
 
     try {
       const newMessage = {
-        name: session?.user?.name || name || '익명',
         message,
         isAnonymous,
-        time: new Date().toISOString(),
       }
 
       const res = await fetch('/api/guestbook', {
@@ -50,14 +73,12 @@ export default function GuestbookClient() {
       }
 
       const savedMessage = await res.json()
-      // 화면에 표시할 때는 isAnonymous 값에 따라 이름을 '익명'으로 변경
       const displayMessage = {
         ...savedMessage,
         name: savedMessage.isAnonymous ? '익명' : savedMessage.name,
       }
       setMessages([displayMessage, ...messages])
       setMessage('')
-      setName('')
     } catch (error) {
       console.error('Submit Error:', error)
       alert(
@@ -96,49 +117,47 @@ export default function GuestbookClient() {
         )}
       </div>
 
-      {/* 방명록 작성 폼 */}
-      <form
-        onSubmit={handleSubmit}
-        className="mb-10 space-y-5 bg-gray-50/50 p-7 rounded-xl border border-gray-100"
-      >
-        {!session && (
-          <input
-            type="text"
-            placeholder="이름 (선택사항)"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full bg-white border border-gray-200 p-3.5 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all duration-200"
-            disabled={isAnonymous}
-          />
-        )}
-        <div className="flex items-center gap-3 mb-2">
-          <input
-            type="checkbox"
-            id="anonymous"
-            checked={isAnonymous}
-            onChange={(e) => setIsAnonymous(e.target.checked)}
-            className="form-checkbox h-5 w-5 text-blue-500 rounded border-gray-300 focus:ring-blue-500/20"
-          />
-          <label htmlFor="anonymous" className="text-sm text-gray-600">
-            익명으로 작성하기
-          </label>
-        </div>
-        <div className="flex gap-3">
-          <input
-            type="text"
-            placeholder="메시지를 입력하세요"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className="flex-1 bg-white border border-gray-200 p-3.5 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all duration-200"
-          />
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-8 py-3.5 rounded-lg hover:bg-blue-600 transition-all duration-200 font-medium whitespace-nowrap shadow-sm hover:shadow"
-          >
-            등록하기
-          </button>
-        </div>
-      </form>
+      {/* 방명록 작성 폼 - 로그인한 경우에만 표시 */}
+      {session && (
+        <form
+          onSubmit={handleSubmit}
+          className="mb-10 space-y-5 bg-gray-50/50 p-7 rounded-xl border border-gray-100"
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <input
+              type="checkbox"
+              id="anonymous"
+              checked={isAnonymous}
+              onChange={(e) => setIsAnonymous(e.target.checked)}
+              className="form-checkbox h-5 w-5 text-blue-500 rounded border-gray-300 focus:ring-blue-500/20"
+            />
+            <label htmlFor="anonymous" className="text-sm text-gray-600">
+              익명으로 작성하기
+            </label>
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-3">
+              <input
+                type="text"
+                placeholder="메시지를 입력하세요 (30글자 이내)"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                maxLength={30}
+                className="flex-1 bg-white border border-gray-200 p-3.5 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all duration-200"
+              />
+              <button
+                type="submit"
+                className="bg-blue-500 text-white px-8 py-3.5 rounded-lg hover:bg-blue-600 transition-all duration-200 font-medium whitespace-nowrap shadow-sm hover:shadow"
+              >
+                등록하기
+              </button>
+            </div>
+            <div className="text-sm text-gray-500 text-right">
+              {message.length}/30
+            </div>
+          </div>
+        </form>
+      )}
 
       {/* 방명록 목록 */}
       <ul className="space-y-5">
@@ -152,7 +171,7 @@ export default function GuestbookClient() {
                 {msg.isAnonymous ? '익명' : msg.name}
               </p>
               <p className="text-sm text-gray-500 group-hover:text-gray-700 transition-colors duration-200">
-                {msg.time}
+                {formatDate(msg.time)}
               </p>
             </div>
             <p className="mt-3 text-gray-700 leading-relaxed">{msg.message}</p>
