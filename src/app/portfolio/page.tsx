@@ -46,6 +46,9 @@ export default function page() {
               <span className="block">
                 익명 버튼을 누르면 익명으로 방명록을 남길 수 있습니다
               </span>
+              <span className="block">
+                홈페이지에는 최근 방명록을 미리보기로 볼 수 있습니다
+              </span>
             </p>
           </div>
         </div>

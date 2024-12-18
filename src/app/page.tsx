@@ -1,15 +1,16 @@
 import Link from 'next/link'
 import { MdArrowForward } from 'react-icons/md'
 import GuestbookPreview from './guestbook/preview'
+import Github from '@/components/Github'
 
 export default function Home() {
   return (
     <div className="isolate min-h-full bg-gradient-to-b from-gray-50 to-gray-100">
       <div className="flex flex-col justify-center items-center min-h-screen relative animate-slideUp text-center p-4">
-        <h1 className="mt-4 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+        <h1 className="mt-4 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 mb-10">
           Hello I&apos;m SeoJin
         </h1>
-
+        <Github />
         <div className="mt-10 flex justify-center">
           <Link
             href="https://github.com/tjwls11"
