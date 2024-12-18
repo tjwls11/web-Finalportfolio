@@ -15,22 +15,22 @@ export default function Header() {
         </div>
         <div className="hidden lg:flex space-x-4">
           <Link
-            href="/about"
+            href="/web"
             className="hover:text-purple-400 transition text-white"
           >
-            About
+            Web
           </Link>
           <Link
-            href="/study"
+            href="/seojin"
             className="hover:text-purple-400 transition text-white"
           >
-            Study
+            AboutMe
           </Link>
           <Link
-            href="/project"
+            href="/portfolio"
             className="hover:text-purple-400 transition text-white"
           >
-            Project
+            Portfolio
           </Link>
         </div>
         <div className="lg:hidden">
@@ -51,18 +51,18 @@ export default function Header() {
               About
             </Link>
             <Link
-              href="/study"
+              href="/seojin"
               className="hover:text-purple-400 transition"
               onClick={() => setMenuOpen(false)}
             >
-              Study
+              AboutMe
             </Link>
             <Link
-              href="/project"
+              href="/portfolio"
               className="hover:text-purple-400 transition"
               onClick={() => setMenuOpen(false)}
             >
-              Project
+              Portfolio
             </Link>
           </div>
         </div>

@@ -122,7 +122,11 @@ export default function GuestbookClient() {
       <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
         방명록
       </h1>
-
+      <p className="text-center text-gray-600 mb-8">
+        저의 포트폴리오 페이지에 오신걸 환영합니다
+        <br className="pt-4" />
+        방명록을 남겨주세요
+      </p>
       {/* 로그인/로그아웃 섹션 */}
       <div className="mb-8 bg-white/50 p-5 rounded-2xl border border-gray-100 backdrop-blur-sm shadow-sm">
         {session ? (
